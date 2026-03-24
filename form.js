@@ -2958,9 +2958,12 @@ function handleModelChange() {
     }
 }
 
+// ... остальной код (списки марок, функции populateYears и т.д.) ...
+
 // Отправка формы
 function handleSubmit(event) {
     event.preventDefault();
+    console.log('Submit triggered');  // Лог
 
     let brandValue = document.getElementById('brand').value;
     if (document.getElementById('brand_other').style.display !== 'none') {
@@ -2995,14 +2998,17 @@ function handleSubmit(event) {
         return;
     }
 
+    console.log('Form data:', formData);  // Лог
+
     if (window.Telegram && Telegram.WebApp) {
         Telegram.WebApp.sendData(JSON.stringify(formData));
+        console.log('Data sent');  // Лог
     } else {
-        console.log(formData);
-        alert('Данные отправлены (в реальном боте они уйдут в Telegram)');
+        alert('Форма должна открываться через Telegram');
     }
 }
 
+// Инициализация
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');
     if (window.Telegram && Telegram.WebApp) {
@@ -3017,15 +3023,5 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function handleSubmit(event) {
-    event.preventDefault();
-    console.log('Submit triggered');
-    // ... сбор данных ...
-    console.log('Form data:', formData);
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify(formData));
-        console.log('Data sent');
-    } else {
-        alert('Форма должна открываться через Telegram');
-    }
-}
+// Привязка обработчика к форме (добавить, если отсутствует)
+document.getElementById('carForm').addEventListener('submit', handleSubmit);
