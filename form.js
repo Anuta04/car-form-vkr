@@ -3023,5 +3023,4 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Привязка обработчика к форме (добавить, если отсутствует)
-document.getElementById('carForm').addEventListener('submit', handleSubmit);
+
