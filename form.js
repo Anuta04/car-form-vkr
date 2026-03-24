@@ -3003,19 +3003,29 @@ function handleSubmit(event) {
     }
 }
 
-// Инициализация
 window.addEventListener('DOMContentLoaded', () => {
-    populateYears();
-
-    document.getElementById('brand').addEventListener('change', handleBrandChange);
-    document.getElementById('brand_other').addEventListener('input', updateModels);
-    document.getElementById('model').addEventListener('change', handleModelChange);
-    document.getElementById('carForm').addEventListener('submit', handleSubmit);
-
+    console.log('DOM loaded');
     if (window.Telegram && Telegram.WebApp) {
+        console.log('Telegram WebApp found');
         Telegram.WebApp.ready();
         Telegram.WebApp.MainButton.setText('Отправить').show().onClick(() => {
+            console.log('Main button clicked');
             document.getElementById('carForm').dispatchEvent(new Event('submit'));
         });
+    } else {
+        console.log('Telegram WebApp not present');
     }
 });
+
+function handleSubmit(event) {
+    event.preventDefault();
+    console.log('Submit triggered');
+    // ... сбор данных ...
+    console.log('Form data:', formData);
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify(formData));
+        console.log('Data sent');
+    } else {
+        alert('Форма должна открываться через Telegram');
+    }
+}
