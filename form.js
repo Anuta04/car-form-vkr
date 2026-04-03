@@ -2865,7 +2865,7 @@ const modelsByBrand = {
     "Z700"
   ]
 };
-// Функция заполнения годов
+// Заполнение выпадающего списка годов
 function populateYears() {
     const yearSelect = document.getElementById('year');
     const currentYear = new Date().getFullYear();
@@ -2902,7 +2902,6 @@ function updateModels() {
     const modelSelect = document.getElementById('model');
     const modelOther = document.getElementById('model_other');
 
-    // Определяем выбранную марку
     let selectedBrand;
     if (brandSelect.style.display !== 'none' && brandSelect.value !== 'other') {
         selectedBrand = brandSelect.value;
@@ -2912,7 +2911,6 @@ function updateModels() {
         selectedBrand = null;
     }
 
-    // Очищаем список моделей
     modelSelect.innerHTML = '<option value="">-- Выберите модель --</option>';
     modelOther.style.display = 'none';
     modelOther.required = false;
@@ -2920,20 +2918,17 @@ function updateModels() {
     modelSelect.required = true;
 
     if (selectedBrand && selectedBrand !== '' && modelsByBrand[selectedBrand]) {
-        // Если марка есть в справочнике, добавляем её модели
         modelsByBrand[selectedBrand].forEach(model => {
             const option = document.createElement('option');
             option.value = model;
             option.textContent = model;
             modelSelect.appendChild(option);
         });
-        // Добавляем пункт "Другая модель"
         const otherOption = document.createElement('option');
         otherOption.value = 'other_model';
         otherOption.textContent = 'Другая модель (вписать вручную)';
         modelSelect.appendChild(otherOption);
     } else {
-        // Если марка не в справочнике или введена вручную, показываем только "Другую модель"
         const otherOption = document.createElement('option');
         otherOption.value = 'other_model';
         otherOption.textContent = 'Другая модель (вписать вручную)';
@@ -2958,19 +2953,14 @@ function handleModelChange() {
     }
 }
 
-// ... остальной код (списки марок, функции populateYears и т.д.) ...
-
-// Отправка формы
-function handleSubmit(event) {
-    event.preventDefault();
-    console.log('Submit triggered');  // Лог
-
+// Единая функция отправки данных
+function submitForm() {
     let brandValue = document.getElementById('brand').value;
     if (document.getElementById('brand_other').style.display !== 'none') {
         brandValue = document.getElementById('brand_other').value.trim();
         if (!brandValue) {
             alert('Введите марку');
-            return;
+            return false;
         }
     }
 
@@ -2979,48 +2969,53 @@ function handleSubmit(event) {
         modelValue = document.getElementById('model_other').value.trim();
         if (!modelValue) {
             alert('Введите модель');
-            return;
+            return false;
         }
     }
+
+    let engineVolume = document.getElementById('engine_volume').value;
+    if (engineVolume === "") engineVolume = null;
 
     const formData = {
         brand: brandValue,
         model: modelValue,
         year: document.getElementById('year').value,
         fuel: document.getElementById('fuel').value,
-        engine_volume: document.getElementById('engine_volume').value,
+        engine_volume: engineVolume,
         mileage: document.getElementById('mileage').value,
-        nickname: document.getElementById('nickname').value
+        nickname: document.getElementById('nickname').value || ''
     };
 
     if (!formData.year || !formData.fuel || !formData.mileage) {
         alert('Пожалуйста, заполните все обязательные поля');
-        return;
+        return false;
     }
-
-    console.log('Form data:', formData);  // Лог
 
     if (window.Telegram && Telegram.WebApp) {
         Telegram.WebApp.sendData(JSON.stringify(formData));
-        console.log('Data sent');  // Лог
+        Telegram.WebApp.close(); // Закрываем WebApp после отправки
     } else {
-        alert('Форма должна открываться через Telegram');
+        console.log(formData);
+        alert('Данные отправлены (в реальном боте они уйдут в Telegram)');
     }
+    return true;
 }
 
-// Инициализация
+// Инициализация при загрузке страницы
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded');
+    populateYears();
+    updateModels();
+
     if (window.Telegram && Telegram.WebApp) {
-        console.log('Telegram WebApp found');
         Telegram.WebApp.ready();
         Telegram.WebApp.MainButton.setText('Отправить').show().onClick(() => {
-            console.log('Main button clicked');
-            document.getElementById('carForm').dispatchEvent(new Event('submit'));
+            submitForm();
         });
-    } else {
-        console.log('Telegram WebApp not present');
     }
+
+    const form = document.getElementById('carForm');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitForm();
+    });
 });
-
-
