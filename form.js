@@ -104,8 +104,7 @@ const modelsByBrand = {
   "Zeekr": ["001", "009", "X", "Mix", "007"],
   "Zotye": ["2008", "5008", "E200", "SR7", "SR9", "T200", "T300", "T500", "T600", "T700", "Z100", "Z200", "Z300", "Z500", "Z700"]
 };
-
-// Заполнение выпадающего списка годов
+// Функция заполнения годов
 function populateYears() {
     const yearSelect = document.getElementById('year');
     const currentYear = new Date().getFullYear();
@@ -117,7 +116,7 @@ function populateYears() {
     }
 }
 
-// Обработка выбора марки (переключение на ручной ввод)
+// Обработка выбора марки
 function handleBrandChange() {
     const brandSelect = document.getElementById('brand');
     const brandOther = document.getElementById('brand_other');
@@ -126,55 +125,49 @@ function handleBrandChange() {
         brandOther.style.display = 'block';
         brandOther.required = true;
         brandSelect.required = false;
-        // При переключении на ручной ввод сразу обновляем модели (по текущему тексту в поле)
-        updateModels();
     } else {
         brandSelect.style.display = 'block';
         brandOther.style.display = 'none';
         brandOther.required = false;
         brandSelect.required = true;
-        updateModels();
     }
+    updateModels();
 }
 
-// Обновление списка моделей в зависимости от выбранной марки
+// Обновление списка моделей
 function updateModels() {
     const brandSelect = document.getElementById('brand');
     const brandOther = document.getElementById('brand_other');
     const modelSelect = document.getElementById('model');
     const modelOther = document.getElementById('model_other');
 
-    // Определяем текущую марку
-    let selectedBrand = null;
+    let selectedBrand;
     if (brandSelect.style.display !== 'none' && brandSelect.value !== 'other') {
         selectedBrand = brandSelect.value;
     } else if (brandOther.style.display !== 'none') {
         selectedBrand = brandOther.value.trim();
+    } else {
+        selectedBrand = null;
     }
 
-    // Очищаем список моделей
     modelSelect.innerHTML = '<option value="">-- Выберите модель --</option>';
-    // Прячем ручной ввод модели, показываем select
     modelOther.style.display = 'none';
     modelOther.required = false;
     modelSelect.style.display = 'block';
     modelSelect.required = true;
 
     if (selectedBrand && selectedBrand !== '' && modelsByBrand[selectedBrand]) {
-        // Добавляем модели из справочника
         modelsByBrand[selectedBrand].forEach(model => {
             const option = document.createElement('option');
             option.value = model;
             option.textContent = model;
             modelSelect.appendChild(option);
         });
-        // Добавляем пункт "Другая модель"
         const otherOption = document.createElement('option');
         otherOption.value = 'other_model';
         otherOption.textContent = 'Другая модель (вписать вручную)';
         modelSelect.appendChild(otherOption);
     } else {
-        // Если марка не выбрана или её нет в справочнике — только "Другая модель"
         const otherOption = document.createElement('option');
         otherOption.value = 'other_model';
         otherOption.textContent = 'Другая модель (вписать вручную)';
@@ -182,7 +175,6 @@ function updateModels() {
     }
 }
 
-// Обработка выбора модели (переключение на ручной ввод)
 function handleModelChange() {
     const modelSelect = document.getElementById('model');
     const modelOther = document.getElementById('model_other');
@@ -199,7 +191,14 @@ function handleModelChange() {
     }
 }
 
-// Отправка данных
+// Валидация VIN-кода
+function validateVIN(vin) {
+    if (!vin) return false;
+    const vinRegex = /^[A-HJ-NPR-Z0-9]{17}$/;
+    return vinRegex.test(vin);
+}
+
+// Отправка данных (исправленная, без дублирования)
 function submitForm() {
     let brandValue = document.getElementById('brand').value;
     if (document.getElementById('brand_other').style.display !== 'none') {
@@ -222,6 +221,12 @@ function submitForm() {
     let engineVolume = document.getElementById('engine_volume').value;
     if (engineVolume === "") engineVolume = null;
 
+    const vinCode = document.getElementById('vin_code').value.trim().toUpperCase();
+    if (!validateVIN(vinCode)) {
+        alert('VIN-код должен содержать ровно 17 символов: латинские буквы (кроме I, O, Q) и цифры 0-9.');
+        return false;
+    }
+
     const formData = {
         brand: brandValue,
         model: modelValue,
@@ -229,6 +234,7 @@ function submitForm() {
         fuel: document.getElementById('fuel').value,
         engine_volume: engineVolume,
         mileage: document.getElementById('mileage').value,
+        vin_code: vinCode,
         nickname: document.getElementById('nickname').value || ''
     };
 
@@ -251,19 +257,15 @@ function submitForm() {
 window.addEventListener('DOMContentLoaded', () => {
     populateYears();
 
-    // Получаем элементы
     const brandSelect = document.getElementById('brand');
     const brandOther = document.getElementById('brand_other');
     const modelSelect = document.getElementById('model');
 
-    // Навешиваем обработчики
     brandSelect.addEventListener('change', handleBrandChange);
-    brandOther.addEventListener('input', updateModels);  // при вводе текста вручную обновляем модели
+    if (brandOther) {
+        brandOther.addEventListener('input', updateModels);
+    }
     modelSelect.addEventListener('change', handleModelChange);
-
-    // Если вдруг изначально выбран not other, но нужно обновить модели? По умолчанию марка не выбрана, ничего не делаем.
-    // Но если вдруг браузер запомнил значение, можно вызвать updateModels() один раз, но аккуратно.
-    // Лучше не вызывать, чтобы не затереть начальное сообщение "-- Сначала выберите марку --"
 
     const form = document.getElementById('carForm');
     form.addEventListener('submit', (e) => {
