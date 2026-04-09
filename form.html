@@ -129,7 +129,7 @@
             </select>
             <input type="text" id="model_other" class="other-input" placeholder="Введите модель" style="display: none;">
 
-            <!-- Остальные поля -->
+            <!-- Год и топливо -->
             <div class="row">
                 <div class="col">
                     <label for="year">Год выпуска <span>*</span></label>
@@ -150,6 +150,7 @@
                 </div>
             </div>
 
+            <!-- Объём и пробег -->
             <div class="row">
                 <div class="col">
                     <label for="engine_volume">Объём двигателя, л / ёмкость батареи, кВт·ч</label>
@@ -161,8 +162,21 @@
                 </div>
             </div>
 
+            <!-- VIN-код (новое поле) -->
+            <label for="vin_code">VIN-код <span>*</span></label>
+            <input type="text" name="vin_code" id="vin_code" maxlength="17" required
+                   placeholder="17 символов (латиница A-Z, цифры 0-9, без I, O, Q)"
+                   pattern="[A-HJ-NPR-Z0-9]{17}"
+                   title="VIN должен состоять из 17 символов: буквы A-Z (кроме I,O,Q) и цифры 0-9">
+            <small style="color: #666; display: block; margin-top: -10px; margin-bottom: 10px;">
+                Пример: JHMGD38409S123456
+            </small>
+
+            <!-- Псевдоним -->
             <label for="nickname">Псевдоним автомобиля (необязательно)</label>
             <input type="text" name="nickname" id="nickname" placeholder="Например, «Ласточка»">
+
+            <button type="submit">Зарегистрировать автомобиль</button>
             <p class="note">* Поля, обязательные для заполнения.</p>
         </form>
     </div>
