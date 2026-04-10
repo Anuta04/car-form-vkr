@@ -39,6 +39,29 @@
             margin-bottom: 20px;
             font-size: 1rem;
         }
+        .filters {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        select, button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 0.9rem;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
         canvas {
             max-width: 100%;
             height: auto;
@@ -66,9 +89,6 @@
             margin-top: 20px;
             width: 100%;
         }
-        .back-button:hover {
-            background: #45a049;
-        }
         @media (max-width: 500px) {
             .container { padding: 15px; }
             h2 { font-size: 1.2rem; }
@@ -77,17 +97,31 @@
 </head>
 <body>
     <div class="container">
-        <h2>📊 Статистика расходов</h2>
+        <h2>Статистика расходов</h2>
         <div class="car-name" id="carName">Загрузка...</div>
+        <div class="filters" id="filters">
+            <select id="periodSelect">
+                <option value="week">Неделя</option>
+                <option value="month">Месяц</option>
+                <option value="year">Год</option>
+                <option value="all" selected>Всё время</option>
+            </select>
+            <select id="categorySelect">
+                <option value="all" selected>Все категории</option>
+            </select>
+            <button id="applyFilters">Применить</button>
+        </div>
         <canvas id="expenseChart" width="400" height="400"></canvas>
         <div class="total" id="totalAmount"></div>
-        <button class="back-button" onclick="closeWebApp()">🔙 Закрыть</button>
-        <div class="note">Данные за всё время по выбранному автомобилю</div>
+        <button class="back-button" onclick="closeWebApp()">Закрыть</button>
+        <div class="note">Данные по выбранному автомобилю</div>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let chart = null;
+        let currentData = null;
+        let availableCategories = [];
 
         function closeWebApp() {
             if (window.Telegram && Telegram.WebApp) {
@@ -97,10 +131,9 @@
             }
         }
 
-        function initChart(labels, data, total, carName) {
+        function initOverviewChart(labels, data, total, carName) {
             const ctx = document.getElementById('expenseChart').getContext('2d');
             if (chart) chart.destroy();
-            
             chart = new Chart(ctx, {
                 type: 'pie',
                 data: {
@@ -118,10 +151,7 @@
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { font: { size: 12 } }
-                        },
+                        legend: { position: 'bottom', labels: { font: { size: 12 } } },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -135,34 +165,88 @@
                     }
                 }
             });
-            
             document.getElementById('carName').innerText = carName;
-            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: ${total.toFixed(2)} руб.`;
+            document.getElementById('totalAmount').innerHTML = `Общая сумма: ${total.toFixed(2)} руб.`;
+        }
+
+        function initDetailChart(labels, data, total, categoryName, carName) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Расходы по категории "${categoryName}"`,
+                        data: data,
+                        borderColor: '#36A2EB',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(2)} руб.` } }
+                    },
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'руб.' } } }
+                }
+            });
+            document.getElementById('carName').innerHTML = `${carName}<br>Детализация: ${categoryName}`;
+            document.getElementById('totalAmount').innerHTML = `Сумма за период: ${total.toFixed(2)} руб.`;
+        }
+
+        function updateCategoriesSelect(categories) {
+            const select = document.getElementById('categorySelect');
+            select.innerHTML = '<option value="all" selected>Все категории</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            if (!currentData || !currentData.car_id) return;
+            const period = document.getElementById('periodSelect').value;
+            const categoryId = document.getElementById('categorySelect').value;
+            // Перезагружаем страницу с новыми параметрами (можно через fetch к боту, но проще через URL)
+            const baseUrl = window.location.href.split('?')[0];
+            const newUrl = `${baseUrl}?car_id=${currentData.car_id}&period=${period}&category=${categoryId}`;
+            window.location.href = newUrl;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.ready();
-                Telegram.WebApp.expand(); // растягиваем на весь экран
+                Telegram.WebApp.expand();
             }
-
-            // Получаем данные из URL параметра data
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
-            
             if (!dataParam) {
                 document.getElementById('carName').innerText = 'Ошибка: нет данных';
                 return;
             }
-            
             try {
                 const decoded = decodeURIComponent(dataParam);
                 const stats = JSON.parse(decoded);
-                if (stats && stats.labels && stats.values && stats.total && stats.car_name) {
-                    initChart(stats.labels, stats.values, stats.total, stats.car_name);
+                currentData = stats;
+                if (stats.type === 'overview') {
+                    initOverviewChart(stats.labels, stats.values, stats.total, stats.car_name);
+                    // Для выбора категорий нужно получить список всех категорий авто (можно запросить через бот, но для простоты показываем только общий вид)
+                    // Можно также добавить скрытый параметр categories, но для упрощения покажем только выбор периода
+                    document.getElementById('categorySelect').style.display = 'none';
+                } else if (stats.type === 'detail') {
+                    initDetailChart(stats.labels, stats.values, stats.total, stats.category_name, stats.car_name);
+                    document.getElementById('categorySelect').style.display = 'none';
                 } else {
-                    throw new Error('Неверный формат данных');
+                    throw new Error('Неизвестный тип данных');
                 }
+                // Навешиваем обработчик кнопки
+                document.getElementById('applyFilters').addEventListener('click', applyFilters);
             } catch (e) {
                 console.error(e);
                 document.getElementById('carName').innerText = 'Ошибка загрузки данных';
