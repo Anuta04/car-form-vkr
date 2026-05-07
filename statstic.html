@@ -175,8 +175,8 @@
                     }
                     // После отправки страница закроется, но бот пришлёт новую кнопку – это костыль
                     // Для полноценной работы лучше перезагрузить страницу с новыми параметрами:
-                     const newUrl = window.location.pathname + `?car_id=${currentData.car_id}&period=${period}&category=${categoryId}`;
-                     window.location.href = newUrl;
+                    // const newUrl = window.location.pathname + `?car_id=${currentData.car_id}&period=${period}&category=${categoryId}`;
+                    // window.location.href = newUrl;
                 });
             } catch (e) {
                 console.error(e);
