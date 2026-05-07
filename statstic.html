@@ -27,6 +27,27 @@
         }
         h2 { color: #333; margin-bottom: 10px; font-size: 1.5rem; }
         .car-name { color: #666; margin-bottom: 20px; font-size: 1rem; }
+        .filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        select, button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 0.9rem;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background: #45a049; }
         canvas { max-width: 100%; height: auto; margin: 20px 0; }
         .total { font-size: 1.2rem; font-weight: bold; color: #2c7da0; margin-top: 10px; }
         .back-button {
@@ -40,7 +61,6 @@
             margin-top: 20px;
             width: 100%;
         }
-        .back-button:hover { background: #45a049; }
         .note { font-size: 0.8rem; color: #999; margin-top: 20px; }
         @media (max-width: 500px) { .container { padding: 15px; } h2 { font-size: 1.2rem; } }
     </style>
@@ -49,15 +69,29 @@
     <div class="container">
         <h2>📊 Статистика расходов</h2>
         <div class="car-name" id="carName">Загрузка...</div>
+        <div class="filters">
+            <select id="periodSelect">
+                <option value="all">Всё время</option>
+                <option value="week">Неделя</option>
+                <option value="month">Месяц</option>
+                <option value="year">Год</option>
+            </select>
+            <select id="categorySelect">
+                <option value="all">Все категории</option>
+                <!-- Заполняется из переданных данных -->
+            </select>
+            <button id="applyFilters">Применить</button>
+        </div>
         <canvas id="expenseChart" width="400" height="400"></canvas>
         <div class="total" id="totalAmount"></div>
-        <button class="back-button" onclick="closeWebApp()">🔙 Закрыть</button>
-        <div class="note">Данные за всё время по выбранному автомобилю</div>
+        <button class="back-button" onclick="closeWebApp()"> Закрыть</button>
+        <div class="note">Выберите период и категорию</div>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         let chart = null;
+        let currentData = null;
 
         function closeWebApp() {
             if (window.Telegram && Telegram.WebApp) Telegram.WebApp.close();
@@ -69,41 +103,35 @@
             if (chart) chart.destroy();
             chart = new Chart(ctx, {
                 type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#C9CBCF','#7B68EE','#20B2AA','#FF69B4'],
-                        borderWidth: 0
-                    }]
-                },
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#C9CBCF','#7B68EE','#20B2AA','#FF69B4'], borderWidth: 0 }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
                         legend: { position: 'bottom', labels: { font: { size: 12 } } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw;
-                                    const total = context.dataset.data.reduce((a,b) => a+b, 0);
-                                    const percent = ((value / total) * 100).toFixed(1);
-                                    return `${context.label}: ${value.toFixed(2)} руб. (${percent}%)`;
-                                }
-                            }
-                        }
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw.toFixed(2)} руб. (${((ctx.raw / total)*100).toFixed(1)}%)` } }
                     }
                 }
             });
             document.getElementById('carName').innerText = carName;
-            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: ${total.toFixed(2)} руб.`;
+            document.getElementById('totalAmount').innerHTML = ` Общая сумма: ${total.toFixed(2)} руб.`;
+        }
+
+        function populateCategorySelect(categories, currentCategoryId) {
+            const select = document.getElementById('categorySelect');
+            select.innerHTML = '<option value="all">Все категории</option>';
+            for (const cat of categories) {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                if (currentCategoryId && currentCategoryId == cat.id) option.selected = true;
+                select.appendChild(option);
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-            }
+            if (window.Telegram && Telegram.WebApp) Telegram.WebApp.ready();
+
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
             if (!dataParam) {
@@ -111,19 +139,48 @@
                 return;
             }
             try {
-                const decoded = decodeURIComponent(dataParam);
-                const stats = JSON.parse(decoded);
-                if (stats.type === 'overview' && stats.labels && stats.values && stats.total && stats.car_name) {
+                const stats = JSON.parse(decodeURIComponent(dataParam));
+                currentData = stats;
+                if (stats.type === 'overview') {
                     initChart(stats.labels, stats.values, stats.total, stats.car_name);
+                    // Сохраняем список категорий для выпадающего списка, если он есть
+                    if (stats.categories) populateCategorySelect(stats.categories, null);
                 } else if (stats.type === 'detail') {
-                    initChart([stats.category_name], [stats.total], stats.total, `${stats.car_name} (${stats.category_name})`);
+                    initChart([stats.category_name], [stats.total], stats.total, stats.car_name + ' (' + stats.category_name + ')');
+                    document.getElementById('categorySelect').style.display = 'none';
                 } else {
-                    throw new Error('Неверный формат данных');
+                    throw new Error('Неверный тип данных');
                 }
+                // Настройка выбора периода из URL
+                const period = urlParams.get('period') || 'all';
+                document.getElementById('periodSelect').value = period;
+                // Обработчик кнопки
+                document.getElementById('applyFilters').addEventListener('click', () => {
+                    const period = document.getElementById('periodSelect').value;
+                    const categoryId = document.getElementById('categorySelect').value;
+                    // Получаем car_id из текущих данных
+                    if (!currentData.car_id) {
+                        // car_id нужно передать отдельно, например, через другую переменную
+                        console.error('car_id не найден');
+                        return;
+                    }
+                    // Отправляем запрос боту через sendData
+                    if (window.Telegram && Telegram.WebApp) {
+                        Telegram.WebApp.sendData(JSON.stringify({
+                            action: 'stats_filter',
+                            car_id: currentData.car_id,
+                            period: period,
+                            category: categoryId
+                        }));
+                    }
+                    // После отправки страница закроется, но бот пришлёт новую кнопку – это костыль
+                    // Для полноценной работы лучше перезагрузить страницу с новыми параметрами:
+                    // const newUrl = window.location.pathname + `?car_id=${currentData.car_id}&period=${period}&category=${categoryId}`;
+                    // window.location.href = newUrl;
+                });
             } catch (e) {
                 console.error(e);
                 document.getElementById('carName').innerText = 'Ошибка загрузки данных';
-                document.getElementById('totalAmount').innerHTML = 'Попробуйте снова позже';
             }
         });
     </script>
