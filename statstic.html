@@ -152,13 +152,13 @@
 </head>
 <body>
 <div class="container">
-    <h2>📊 Аналитика расходов</h2>
+    <h2> Аналитика расходов</h2>
     <div class="sub">по автомобилю</div>
     <div class="car-name" id="carName">Загрузка...</div>
 
     <div class="filters">
         <div class="filter-group">
-            <label>📅 Период</label>
+            <label> Период</label>
             <select id="periodSelect">
                 <option value="all">Всё время</option>
                 <option value="week">Последние 7 дней</option>
@@ -175,9 +175,9 @@
     </div>
 
     <canvas id="expenseChart" width="500" height="400"></canvas>
-    <div class="total" id="totalAmount">💰 Общая сумма: 0 руб.</div>
-    <button id="applyFiltersBtn">🔄 Применить фильтры</button>
-    <button class="back-button" onclick="closeWebApp()">🔙 Закрыть</button>
+    <div class="total" id="totalAmount"> Общая сумма: 0 руб.</div>
+    <button id="applyFiltersBtn"> Применить фильтры</button>
+    <button class="back-button" onclick="closeWebApp()"> Закрыть</button>
     <div class="legend-note">* Данные группируются по категориям за выбранный период</div>
 </div>
 
@@ -231,7 +231,7 @@
         const categories = [...new Set(records.map(r => r.category))].sort();
         const select = document.getElementById('categorySelect');
         const currentVal = select.value;
-        select.innerHTML = '<option value="all">📌 Все категории</option>';
+        select.innerHTML = '<option value="all"> Все категории</option>';
         categories.forEach(cat => {
             const opt = document.createElement('option');
             opt.value = cat;
@@ -252,7 +252,7 @@
 
         if (labels.length === 0) {
             // Пустые данные — показываем заглушку
-            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: 0 руб.`;
+            document.getElementById('totalAmount').innerHTML = ` Общая сумма: 0 руб.`;
             chart = new Chart(ctx, {
                 type: 'pie',
                 data: { labels: ['Нет данных'], datasets: [{ data: [1], backgroundColor: ['#e2e8f0'], borderWidth: 0 }] },
@@ -294,7 +294,7 @@
             }
         });
 
-        document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: ${total.toFixed(2)} руб.`;
+        document.getElementById('totalAmount').innerHTML = ` Общая сумма: ${total.toFixed(2)} руб.`;
         document.getElementById('carName').innerHTML = carName;
     }
 
