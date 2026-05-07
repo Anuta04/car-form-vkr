@@ -43,13 +43,13 @@
 </head>
 <body>
 <div class="container">
-    <h2>📊 Аналитика расходов</h2>
+    <h2> Аналитика расходов</h2>
     <div class="sub">по автомобилю</div>
     <div class="car-name" id="carName">Загрузка...</div>
 
     <div class="filters">
         <div class="filter-group">
-            <label>📅 Период</label>
+            <label> Период</label>
             <select id="periodSelect">
                 <option value="all">Всё время</option>
                 <option value="week">Последние 7 дней</option>
@@ -58,7 +58,7 @@
             </select>
         </div>
         <div class="filter-group">
-            <label>🔧 Категория</label>
+            <label> Категория</label>
             <select id="categorySelect">
                 <option value="all">Все категории</option>
             </select>
@@ -66,9 +66,9 @@
     </div>
 
     <canvas id="expenseChart" width="500" height="400"></canvas>
-    <div class="total" id="totalAmount">💰 Общая сумма: 0 руб.</div>
-    <button id="applyFiltersBtn">🔄 Применить фильтры</button>
-    <button class="back-button" onclick="closeWebApp()">🔙 Закрыть</button>
+    <div class="total" id="totalAmount"> Общая сумма: 0 руб.</div>
+    <button id="applyFiltersBtn"> Применить фильтры</button>
+    <button class="back-button" onclick="closeWebApp()"> Закрыть</button>
     <div class="legend-note">* Наведите на сектор, чтобы увидеть детализацию по конкретным услугам</div>
 </div>
 
@@ -110,7 +110,7 @@
         const categories = Object.keys(fullAgg).sort();
         const select = document.getElementById('categorySelect');
         const currentVal = select.value;
-        select.innerHTML = '<option value="all">📌 Все категории</option>';
+        select.innerHTML = '<option value="all"> Все категории</option>';
         categories.forEach(cat => {
             const opt = document.createElement('option');
             opt.value = cat;
@@ -128,7 +128,7 @@
         if (selectedRootCategory && selectedRootCategory !== 'all') {
             const rootData = agg[selectedRootCategory];
             if (!rootData || rootData.details.length === 0) {
-                document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: 0 руб.`;
+                document.getElementById('totalAmount').innerHTML = ` Общая сумма: 0 руб.`;
                 document.getElementById('carName').innerHTML = `${carName} — нет данных`;
                 return;
             }
@@ -140,7 +140,7 @@
                 data: { labels, datasets: [{ data: values, backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#C9CBCF','#7B68EE','#20B2AA','#FF69B4'], borderWidth: 0 }] },
                 options: { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw.toFixed(2)} руб.` } } } }
             });
-            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма по категории "${selectedRootCategory}": ${total.toFixed(2)} руб.`;
+            document.getElementById('totalAmount').innerHTML = ` Общая сумма по категории "${selectedRootCategory}": ${total.toFixed(2)} руб.`;
             document.getElementById('carName').innerHTML = carName;
             return;
         }
@@ -189,7 +189,7 @@
             }
         });
 
-        document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: ${total.toFixed(2)} руб.`;
+        document.getElementById('totalAmount').innerHTML = ` Общая сумма: ${total.toFixed(2)} руб.`;
         document.getElementById('carName').innerHTML = carName;
     }
 
@@ -203,7 +203,7 @@
         }
         const agg = aggregateByRootCategory(filtered);
         if (Object.keys(agg).length === 0) {
-            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: 0 руб.`;
+            document.getElementById('totalAmount').innerHTML = ` Общая сумма: 0 руб.`;
             if (chart) chart.destroy();
             chart = null;
             document.getElementById('carName').innerHTML = `${carName} — нет данных`;
