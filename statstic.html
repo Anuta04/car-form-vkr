@@ -6,13 +6,9 @@
     <title>Статистика расходов</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             background: #f5f7fb;
             padding: 16px;
             min-height: 100vh;
@@ -25,140 +21,35 @@
             width: 100%;
             background: white;
             border-radius: 28px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
             padding: 20px 16px 24px;
-            transition: all 0.2s;
         }
-        h2 {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .sub {
-            font-size: 0.85rem;
-            color: #5b6e8c;
-            border-left: 3px solid #4f46e5;
-            padding-left: 10px;
-            margin-top: -4px;
-            margin-bottom: 20px;
-        }
-        .car-name {
-            background: #f1f5f9;
-            padding: 10px 14px;
-            border-radius: 60px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #0f172a;
-            display: inline-block;
-            margin-bottom: 20px;
-            width: auto;
-        }
-        .filters {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin: 18px 0 20px;
-        }
-        .filter-group {
-            flex: 1;
-            min-width: 130px;
-        }
-        label {
-            display: block;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            color: #5b6e8c;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        select, button {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 60px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #1e293b;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: inherit;
-        }
-        select:focus, button:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
-        }
-        button {
-            background: #4f46e5;
-            color: white;
-            border: none;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-        button:hover {
-            background: #4338ca;
-            transform: scale(0.98);
-        }
-        canvas {
-            max-width: 100%;
-            height: auto;
-            margin: 20px 0 10px;
-            background: #ffffff;
-            border-radius: 28px;
-        }
-        .total {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #0f172a;
-            background: #f8fafc;
-            padding: 14px;
-            border-radius: 60px;
-            text-align: center;
-            margin: 16px 0 8px;
-        }
-        .total span {
-            font-size: 0.9rem;
-            font-weight: normal;
-            color: #4f46e5;
-        }
-        .legend-note {
-            font-size: 0.7rem;
-            text-align: center;
-            color: #94a3b8;
-            margin-top: 12px;
-        }
-        .back-button {
-            background: #e2e8f0;
-            color: #1e293b;
-            margin-top: 16px;
-        }
-        .back-button:hover {
-            background: #cbd5e1;
-            transform: none;
-        }
-        @media (max-width: 500px) {
-            .container { padding: 16px; }
-            h2 { font-size: 1.3rem; }
-            .total { font-size: 1.2rem; }
-        }
+        h2 { font-size: 1.6rem; font-weight: 600; color: #1e293b; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .sub { font-size: 0.85rem; color: #5b6e8c; border-left: 3px solid #4f46e5; padding-left: 10px; margin-bottom: 20px; }
+        .car-name { background: #f1f5f9; padding: 10px 14px; border-radius: 60px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-bottom: 20px; }
+        .filters { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 20px; }
+        .filter-group { flex: 1; min-width: 130px; }
+        label { display: block; font-size: 0.7rem; text-transform: uppercase; font-weight: 600; color: #5b6e8c; margin-bottom: 4px; }
+        select, button { width: 100%; padding: 10px 12px; border-radius: 60px; border: 1px solid #e2e8f0; background: white; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        button { background: #4f46e5; color: white; border: none; font-weight: 600; margin-top: 20px; }
+        button:hover { background: #4338ca; transform: scale(0.98); }
+        canvas { max-width: 100%; height: auto; margin: 20px 0; background: #fff; border-radius: 28px; }
+        .total { font-size: 1.4rem; font-weight: 700; background: #f8fafc; padding: 14px; border-radius: 60px; text-align: center; margin: 16px 0 8px; }
+        .back-button { background: #e2e8f0; color: #1e293b; margin-top: 16px; }
+        .back-button:hover { background: #cbd5e1; transform: none; }
+        .legend-note { font-size: 0.7rem; text-align: center; color: #94a3b8; margin-top: 12px; }
+        @media (max-width: 500px) { .container { padding: 16px; } h2 { font-size: 1.3rem; } .total { font-size: 1.2rem; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2> Аналитика расходов</h2>
+    <h2>📊 Аналитика расходов</h2>
     <div class="sub">по автомобилю</div>
     <div class="car-name" id="carName">Загрузка...</div>
 
     <div class="filters">
         <div class="filter-group">
-            <label> Период</label>
+            <label>📅 Период</label>
             <select id="periodSelect">
                 <option value="all">Всё время</option>
                 <option value="week">Последние 7 дней</option>
@@ -175,26 +66,23 @@
     </div>
 
     <canvas id="expenseChart" width="500" height="400"></canvas>
-    <div class="total" id="totalAmount"> Общая сумма: 0 руб.</div>
-    <button id="applyFiltersBtn"> Применить фильтры</button>
-    <button class="back-button" onclick="closeWebApp()"> Закрыть</button>
-    <div class="legend-note">* Данные группируются по категориям за выбранный период</div>
+    <div class="total" id="totalAmount">💰 Общая сумма: 0 руб.</div>
+    <button id="applyFiltersBtn">🔄 Применить фильтры</button>
+    <button class="back-button" onclick="closeWebApp()">🔙 Закрыть</button>
+    <div class="legend-note">* Наведите на сектор, чтобы увидеть детализацию по конкретным услугам</div>
 </div>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
     let chart = null;
-    let rawRecords = [];          // все записи [{ date, category, cost }]
+    let allRecords = [];         // каждая запись: { date, rootCategory, fullPath, cost }
     let carName = "";
-    let categoriesSet = new Set(); // для выпадающего списка
 
-    // Закрытие WebApp
     function closeWebApp() {
         if (window.Telegram && Telegram.WebApp) Telegram.WebApp.close();
         else window.close();
     }
 
-    // Фильтрация записей по периоду (даты в формате YYYY-MM-DD)
     function filterByPeriod(records, periodType) {
         if (periodType === 'all') return records;
         const now = new Date();
@@ -203,35 +91,26 @@
         else if (periodType === 'month') startDate.setDate(now.getDate() - 30);
         else if (periodType === 'year') startDate.setDate(now.getDate() - 365);
         else return records;
-        return records.filter(rec => {
-            const recDate = new Date(rec.date);
-            return recDate >= startDate;
-        });
+        return records.filter(rec => new Date(rec.date) >= startDate);
     }
 
-    // Агрегируем по категориям (сумма cost)
-    function aggregateByCategory(records, selectedCategory) {
-        const filtered = selectedCategory === 'all' ? records : records.filter(rec => rec.category === selectedCategory);
-        if (filtered.length === 0) return {};
-        const sums = {};
-        for (const rec of filtered) {
-            const cat = rec.category;
-            sums[cat] = (sums[cat] || 0) + rec.cost;
+    // Агрегирует по корневой категории: { rootCategory: { total, details: [{ fullPath, cost }] } }
+    function aggregateByRootCategory(records) {
+        const agg = {};
+        for (const rec of records) {
+            const root = rec.rootCategory;
+            if (!agg[root]) agg[root] = { total: 0, details: [] };
+            agg[root].total += rec.cost;
+            agg[root].details.push({ fullPath: rec.fullPath, cost: rec.cost });
         }
-        return sums;
+        return agg;
     }
 
-    // Получить сумму из агрегированного объекта
-    function getTotal(sums) {
-        return Object.values(sums).reduce((acc, val) => acc + val, 0);
-    }
-
-    // Обновить выпадающий список категорий на основе всех записей
-    function updateCategorySelect(records) {
-        const categories = [...new Set(records.map(r => r.category))].sort();
+    function updateCategorySelect(fullAgg) {
+        const categories = Object.keys(fullAgg).sort();
         const select = document.getElementById('categorySelect');
         const currentVal = select.value;
-        select.innerHTML = '<option value="all"> Все категории</option>';
+        select.innerHTML = '<option value="all">📌 Все категории</option>';
         categories.forEach(cat => {
             const opt = document.createElement('option');
             opt.value = cat;
@@ -241,52 +120,68 @@
         });
     }
 
-    // Построить/обновить круговую диаграмму
-    function renderChart(sumsByCategory) {
-        const labels = Object.keys(sumsByCategory);
-        const dataValues = Object.values(sumsByCategory);
-        const total = getTotal(sumsByCategory);
-
+    function renderChart(agg, selectedRootCategory = null) {
         const ctx = document.getElementById('expenseChart').getContext('2d');
         if (chart) chart.destroy();
 
-        if (labels.length === 0) {
-            // Пустые данные — показываем заглушку
-            document.getElementById('totalAmount').innerHTML = ` Общая сумма: 0 руб.`;
+        // Если выбрана конкретная категория, показываем диаграмму по её подуслугам
+        if (selectedRootCategory && selectedRootCategory !== 'all') {
+            const rootData = agg[selectedRootCategory];
+            if (!rootData || rootData.details.length === 0) {
+                document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: 0 руб.`;
+                document.getElementById('carName').innerHTML = `${carName} — нет данных`;
+                return;
+            }
+            const labels = rootData.details.map(d => d.fullPath.split(' -> ').pop());
+            const values = rootData.details.map(d => d.cost);
+            const total = rootData.total;
             chart = new Chart(ctx, {
                 type: 'pie',
-                data: { labels: ['Нет данных'], datasets: [{ data: [1], backgroundColor: ['#e2e8f0'], borderWidth: 0 }] },
-                options: { plugins: { tooltip: { callbacks: { label: () => 'Нет расходов за выбранный период' } } } }
+                data: { labels, datasets: [{ data: values, backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#C9CBCF','#7B68EE','#20B2AA','#FF69B4'], borderWidth: 0 }] },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw.toFixed(2)} руб.` } } } }
             });
-            document.getElementById('carName').innerHTML = `${carName} — нет данных`;
+            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма по категории "${selectedRootCategory}": ${total.toFixed(2)} руб.`;
+            document.getElementById('carName').innerHTML = carName;
             return;
         }
+
+        // Основная диаграмма по корневым категориям
+        const labels = Object.keys(agg);
+        const values = labels.map(l => agg[l].total);
+        const total = values.reduce((a,b) => a+b, 0);
+        // Сохраняем детали для кастомного тултипа
+        const detailsMap = new Map();
+        for (const [root, data] of Object.entries(agg)) detailsMap.set(root, data.details);
 
         const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', '#7B68EE', '#20B2AA', '#FF69B4'];
         const backgroundColors = labels.map((_, idx) => colors[idx % colors.length]);
 
         chart = new Chart(ctx, {
             type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: dataValues,
-                    backgroundColor: backgroundColors,
-                    borderWidth: 0,
-                    hoverOffset: 8
-                }]
-            },
+            data: { labels, datasets: [{ data: values, backgroundColor: backgroundColors, borderWidth: 0, hoverOffset: 8 }] },
             options: {
                 responsive: true,
                 maintainAspectRatio: true,
                 plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 12 }, boxWidth: 12, padding: 12 } },
+                    legend: { position: 'bottom', labels: { font: { size: 12 } } },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: (context) => {
+                                const label = context.label;
                                 const value = context.raw;
                                 const percent = ((value / total) * 100).toFixed(1);
-                                return `${context.label}: ${value.toFixed(2)} руб. (${percent}%)`;
+                                return `${label}: ${value.toFixed(2)} руб. (${percent}%)`;
+                            },
+                            afterBody: (tooltipItems) => {
+                                const label = tooltipItems[0].label;
+                                const details = detailsMap.get(label);
+                                if (!details || details.length === 0) return [];
+                                const lines = ['━━━━━━━━━━━━━━━━━━━━'];
+                                details.forEach(d => {
+                                    const shortName = d.fullPath.split(' -> ').pop();
+                                    lines.push(`${shortName}: ${d.cost.toFixed(2)} руб.`);
+                                });
+                                return lines;
                             }
                         }
                     }
@@ -294,66 +189,49 @@
             }
         });
 
-        document.getElementById('totalAmount').innerHTML = ` Общая сумма: ${total.toFixed(2)} руб.`;
+        document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: ${total.toFixed(2)} руб.`;
         document.getElementById('carName').innerHTML = carName;
     }
 
-    // Главная функция: читает фильтры, фильтрует, агрегирует, рисует
     function applyFiltersAndRender() {
         const period = document.getElementById('periodSelect').value;
         const selectedCategory = document.getElementById('categorySelect').value;
 
-        // 1) Фильтр по дате
-        let filteredByDate = filterByPeriod(rawRecords, period);
-        // 2) Если выбрана конкретная категория — оставляем только её, но агрегация всё равно сгруппирует по категориям
-        //    Для единичной категории диаграмма будет состоять из одного сектора (это нормально)
-        const sums = aggregateByCategory(filteredByDate, selectedCategory);
-        renderChart(sums);
-    }
-
-    // Инициализация: получаем данные от бота
-    window.addEventListener('DOMContentLoaded', () => {
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();   // на весь экран
+        let filtered = filterByPeriod(allRecords, period);
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(rec => rec.rootCategory === selectedCategory);
         }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const dataParam = urlParams.get('data');
-        if (!dataParam) {
-            document.getElementById('carName').innerText = 'Ошибка: данные не переданы';
-            document.getElementById('totalAmount').innerHTML = 'Попробуйте снова через /statsweb';
+        const agg = aggregateByRootCategory(filtered);
+        if (Object.keys(agg).length === 0) {
+            document.getElementById('totalAmount').innerHTML = `💰 Общая сумма: 0 руб.`;
+            if (chart) chart.destroy();
+            chart = null;
+            document.getElementById('carName').innerHTML = `${carName} — нет данных`;
             return;
         }
+        const fullAgg = aggregateByRootCategory(allRecords);
+        updateCategorySelect(fullAgg);
+        renderChart(agg, selectedCategory !== 'all' ? selectedCategory : null);
+    }
 
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.Telegram && Telegram.WebApp) { Telegram.WebApp.ready(); Telegram.WebApp.expand(); }
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        if (!dataParam) { document.getElementById('carName').innerText = 'Ошибка: данные не переданы'; return; }
         try {
             const decoded = decodeURIComponent(dataParam);
             const payload = JSON.parse(decoded);
-            if (!payload.records || !Array.isArray(payload.records)) {
-                throw new Error('Неверный формат данных: ожидается массив записей');
-            }
-            rawRecords = payload.records;
+            if (!payload.records || !Array.isArray(payload.records)) throw new Error('Неверный формат');
+            allRecords = payload.records;
             carName = payload.car_name || 'Автомобиль';
-            // Заполняем выпадающий список категорий
-            updateCategorySelect(rawRecords);
-            // Первичный рендер с дефолтными фильтрами (всё время, все категории)
+            const fullAgg = aggregateByRootCategory(allRecords);
+            updateCategorySelect(fullAgg);
             applyFiltersAndRender();
-
-            // Обработчик кнопки "Применить"
-            document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-                applyFiltersAndRender();
-            });
-
-            // Дополнительно: чтобы при изменении селектов не нужно было каждый раз тыкать кнопку,
-            // можно добавить автообновление по change, но оставим кнопку для явного действия – как в банках.
-            // При желании раскомментировать:
-            // document.getElementById('periodSelect').addEventListener('change', () => applyFiltersAndRender());
-            // document.getElementById('categorySelect').addEventListener('change', () => applyFiltersAndRender());
-
+            document.getElementById('applyFiltersBtn').addEventListener('click', () => applyFiltersAndRender());
         } catch (e) {
             console.error(e);
             document.getElementById('carName').innerText = 'Ошибка загрузки данных';
-            document.getElementById('totalAmount').innerHTML = 'Проверьте формат данных в боте';
         }
     });
 </script>
